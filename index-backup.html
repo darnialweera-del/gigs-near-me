@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Gigs Near Me — Brisbane events, gigs and comedy</title>
+  <meta
+    name="description"
+    content="Find live music, comedy, open mics, DJ nights and local events in Brisbane."
+  >
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a href="#top" class="brand-link" aria-label="Gigs Near Me home">
+        <img
+          src="./assets/GNM_Logo_Cobalt.png"
+          alt="Gigs Near Me"
+          class="site-logo"
+        >
+      </a>
+
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#events">Gigs</a>
+        <a href="#newsletter">Weekly guide</a>
+        <a href="#submit" class="nav-submit-link">List an event</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container">
+        <div class="edition-tag">Edition 01 — Brisbane / Meanjin</div>
+
+        <h1>
+          Find something good<br>
+          <span>near you.</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Live music, comedy, open mics, DJ nights and local events—without the endless scrolling.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#events" class="btn btn-primary">Find Brisbane gigs</a>
+          <a href="#newsletter" class="btn btn-secondary">Get the weekly guide</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="marquee-ribbon" aria-label="What Gigs Near Me offers">
+  <div class="marquee-track">
+    <span>* CURATED LOCAL PLANS * GIGS, COMEDY &amp; NIGHTS OUT * UPDATED WEEKLY * SUPPORT INDEPENDENT ROOMS * NO ENDLESS SCROLLING *&nbsp;</span>
+    <span>* CURATED LOCAL PLANS * GIGS, COMEDY &amp; NIGHTS OUT * UPDATED WEEKLY * SUPPORT INDEPENDENT ROOMS * NO ENDLESS SCROLLING *&nbsp;</span>
+  </div>
+</section>
+
+    <section class="discovery-section" id="events">
+      <div class="container">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">BRISBANE GIG GUIDE</p>
+            <h2>What’s on near you?</h2>
+          </div>
+
+          <p class="demo-note">
+            Demo listings for website testing. Replace with verified events before launch.
+          </p>
+        </div>
+
+        <div class="search-row">
+          <label class="visually-hidden" for="event-search">
+            Search events
+          </label>
+
+          <input
+            id="event-search"
+            class="event-search"
+            type="search"
+            placeholder="Search artists, venues, suburbs…"
+            autocomplete="off"
+          >
+
+        </div>
+
+        <!-- City, suburb, date, event type and price filters -->
+<div class="filter-bar" role="search" aria-label="Event filters">
+
+  <div class="filter-group">
+    <label for="filter-city">City</label>
+    <select id="filter-city" class="filter-select">
+      <option value="brisbane">Brisbane</option>
+      <option value="melbourne" disabled>Melbourne — Coming soon</option>
+      <option value="sydney" disabled>Sydney — Coming soon</option>
+    </select>
+  </div>
+
+  <div class="filter-group">
+    <label for="filter-suburb">Suburb</label>
+    <select id="filter-suburb" class="filter-select">
+      <option value="all">All suburbs</option>
+      <option value="Fortitude Valley">Fortitude Valley</option>
+      <option value="West End">West End</option>
+      <option value="South Brisbane">South Brisbane</option>
+      <option value="Brisbane CBD">Brisbane CBD</option>
+      <option value="New Farm">New Farm</option>
+      <option value="Teneriffe">Teneriffe</option>
+      <option value="Newstead">Newstead</option>
+      <option value="Woolloongabba">Woolloongabba</option>
+      <option value="Paddington">Paddington</option>
+      <option value="Milton">Milton</option>
+      <option value="Northside">Northside</option>
+      <option value="Inner South">Inner South</option>
+      <option value="Bayside / Redlands">Bayside / Redlands</option>
+      <option value="Outer Brisbane">Outer Brisbane</option>
+    </select>
+  </div>
+
+  <div class="filter-group date-picker-wrapper">
+    <label for="date-trigger-btn">Date</label>
+
+    <button
+      type="button"
+      id="date-trigger-btn"
+      class="filter-select date-trigger"
+      aria-haspopup="dialog"
+      aria-expanded="false"
+      aria-controls="date-picker-modal"
+    >
+      <span id="date-trigger-label">Anytime</span>
+      <span aria-hidden="true">⌄</span>
+    </button>
+
+    <div
+      id="date-picker-modal"
+      class="date-modal"
+      role="dialog"
+      aria-labelledby="date-picker-title"
+      hidden
+    >
+      <div class="date-modal-header">
+        <h3 id="date-picker-title">When do you want to go?</h3>
+        <button
+          type="button"
+          id="date-modal-close"
+          class="modal-close-btn"
+          aria-label="Close date picker"
+        >×</button>
+      </div>
+
+      <div class="date-modal-body">
+        <div class="date-presets-panel" aria-label="Date presets">
+          <button type="button" class="preset-btn active" data-preset="anytime" aria-pressed="true">
+            <span>Anytime</span>
+            <span class="preset-count" id="count-anytime">0</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="tonight" aria-pressed="false">
+            <span>Tonight</span>
+            <span class="preset-count" id="count-tonight">0</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="tomorrow" aria-pressed="false">
+            <span>Tomorrow</span>
+            <span class="preset-count" id="count-tomorrow">0</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="this-weekend" aria-pressed="false">
+            <span>This weekend</span>
+            <span class="preset-count" id="count-weekend">0</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="this-week" aria-pressed="false">
+            <span>This week</span>
+            <span class="preset-count" id="count-week">0</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="next-7-days" aria-pressed="false">
+            <span>Next 7 days</span>
+            <span class="preset-count" id="count-7days">0</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="next-30-days" aria-pressed="false">
+            <span>Next 30 days</span>
+            <span class="preset-count" id="count-30days">0</span>
+          </button>
+        </div>
+
+        <div class="date-calendar-panel">
+          <label class="checkbox-label" for="range-toggle-checkbox">
+            <input type="checkbox" id="range-toggle-checkbox">
+            Choose a date range
+          </label>
+
+          <div class="calendar-navigation">
+            <button type="button" id="cal-prev-month" class="cal-nav-btn" aria-label="Previous month">←</button>
+            <span id="cal-month-label" class="calendar-month-title" aria-live="polite"></span>
+            <button type="button" id="cal-next-month" class="cal-nav-btn" aria-label="Next month">→</button>
+          </div>
+
+          <div class="calendar-weekdays" aria-hidden="true">
+            <span>M</span><span>T</span><span>W</span>
+            <span>T</span><span>F</span><span>S</span><span>S</span>
+          </div>
+
+          <div id="calendar-days-grid" class="calendar-days-grid"></div>
+          <p class="calendar-help">Choose dates up to six months ahead.</p>
+        </div>
+      </div>
+
+  <div class="date-modal-footer">
+  <div aria-live="polite">
+    <div id="footer-selection-label">Anytime</div>
+    <div id="footer-selection-sub">0 matching gigs</div>
+  </div>
+  <button type="button" id="date-apply-btn" class="btn btn-primary">Apply</button>
+  <button type="button" id="date-clear-btn" class="btn btn-secondary">Clear</button>
+</div>
+</div>
+</div>
+
+
+  <div class="filter-group">
+    <label for="filter-type">Event type</label>
+    <select id="filter-type" class="filter-select">
+      <option value="all">All event types</option>
+      <option value="Live music">Live music</option>
+      <option value="DJ nights">DJ nights / electronic</option>
+      <option value="Open mic">Open mic</option>
+      <option value="Comedy">Comedy</option>
+      <option value="Arts / culture">Arts / culture</option>
+      <option value="Community events">Community events</option>
+    </select>
+  </div>
+
+  <div class="filter-group">
+    <label for="filter-price">Price</label>
+    <select id="filter-price" class="filter-select">
+      <option value="all">Any price</option>
+      <option value="free">Free</option>
+      <option value="under-15">Under AUD 15</option>
+      <option value="15-30">AUD 15–30</option>
+      <option value="30-50">AUD 30–50</option>
+      <option value="50-plus">AUD 50+</option>
+    </select>
+  </div>
+
+</div>
+
+        <div class="results-row">
+          <p id="events-count-label" aria-live="polite">
+            Loading Brisbane events…
+          </p>
+
+          <button type="button" id="reset-filters" class="reset-button" hidden>
+            Clear filters
+          </button>
+        </div>
+
+        <div id="events-grid" class="events-grid">
+          <!-- Event cards are created by app.js -->
+        </div>
+      </div>
+    </section>
+
+    <section class="container" id="newsletter">
+      <div class="newsletter-section gnm-card">
+        <div class="newsletter-copy">
+          <p class="section-kicker">WEEKLY DISPATCH — EVERY THURSDAY MORNING</p>
+          <h2>The good stuff, in your inbox.</h2>
+          <p>
+            A considered weekly guide to Brisbane gigs, comedy, open mics, DJ nights and local events worth knowing about.
+          </p>
+        </div>
+
+        <form id="newsletter-form" novalidate>
+          <label class="visually-hidden" for="newsletter-email">
+            Your email address
+          </label>
+
+          <div class="newsletter-form-row">
+            <input
+              id="newsletter-email"
+              class="gnm-input"
+              type="email"
+              placeholder="Your email address"
+              autocomplete="email"
+              required
+            >
+
+            <button type="submit" class="btn btn-primary">
+              Get the weekly guide
+            </button>
+          </div>
+
+          <p id="newsletter-feedback" class="form-feedback" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+    <section class="container" id="submit">
+      <div class="submission-section gnm-card">
+        <div class="submission-tag">Free listing for venues for a limited time</div>
+
+        <div class="submission-content">
+          <p class="section-kicker">OPEN CALL — BRISBANE</p>
+          <h2>Putting something on? Let people find it.</h2>
+          <p>
+            Are you a venue, artist, promoter or organiser? Send through your upcoming Brisbane event for consideration.
+          </p>
+        </div>
+
+        <!-- Replace this URL with your real Tally or Google Form URL before launch. -->
+        <a
+          href="https://tally.so"
+          class="btn btn-utility"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Submit an event —&gt;
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <p>Gigs Near Me — Edition 01, Brisbane.</p>
+
+      <div class="footer-links">
+        <a href="#events">Gigs</a>
+        <a href="#newsletter">Weekly guide</a>
+        <a href="#submit">Submit an event</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
