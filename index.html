@@ -62,19 +62,35 @@
 
     <section class="marquee-ribbon" aria-label="What Gigs Near Me offers">
   <div class="marquee-track">
-    <span>* CURATED LOCAL PLANS * GIGS, COMEDY &amp; NIGHTS OUT * UPDATED WEEKLY * SUPPORT INDEPENDENT ROOMS * NO ENDLESS SCROLLING *&nbsp;</span>
-    <span>* CURATED LOCAL PLANS * GIGS, COMEDY &amp; NIGHTS OUT * UPDATED WEEKLY * SUPPORT INDEPENDENT ROOMS * NO ENDLESS SCROLLING *&nbsp;</span>
+    <span>* FEATURED GIGS * FEATURED GIGS * FEATURED GIGS * FEATURED GIGS * FEATURED GIGS * FEATURED GIGS * FEATURED GIGS *&nbsp;</span>
+<span>* FEATURED GIGS * FEATURED GIGS * FEATURED GIGS * FEATURED GIGS * FEATURED GIGS * FEATURED GIGS * FEATURED GIGS *&nbsp;</span>
   </div>
 </section>
 
-    <section class="discovery-section" id="events">
+        <!-- 1. FEATURED SECTION (Always visible 3 curated picks) -->
+    <section class="featured-section" id="featured">
       <div class="container">
         <div class="section-heading">
+          <div>
+            <p class="section-kicker">UPDATED WEEKLY</p>
+<h2>This week's good stuff</h2>
+        </div>
+
+        <!-- Static container for the 3 featured cards -->
+        <div id="featured-grid" class="events-grid featured-grid">
+          <!-- The 3 featured cards will render here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. ALL GIGS & SEARCH RESULTS -->
+    <section class="discovery-section" id="events">
+      <div class="container">
+        <div class="section-heading" style="margin-top: 16px;">
           <div>
             <p class="section-kicker">BRISBANE GIG GUIDE</p>
             <h2>What’s on near you?</h2>
           </div>
-
           <p class="demo-note">
             Demo listings for website testing. Replace with verified events before launch.
           </p>
@@ -263,7 +279,7 @@
           </button>
         </div>
 
-        <div id="events-grid" class="events-grid">
+<div id="events-grid" class="event-results">
           <!-- Event cards are created by app.js -->
         </div>
       </div>

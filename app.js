@@ -48,7 +48,7 @@ const brisbaneEvents = [
     title: "The Brightside Live: Indie Band Showcase",
     venue: "The Brightside",
     suburb: "Fortitude Valley",
-    isoDate: todayISO, // Tonight
+    isoDate: "2026-11-01",
     timeString: "7:30 PM",
     category: "Live music",
     stickerClass: "sticker-music",
@@ -63,7 +63,7 @@ const brisbaneEvents = [
     title: "Boundary Street Acoustic & Open Mic",
     venue: "The Burrow",
     suburb: "West End",
-    isoDate: addDaysToISO(todayISO, 1),
+isoDate: "2026-11-01",
     timeString: "6:30 PM",
     category: "Open mic",
     stickerClass: "sticker-openmic",
@@ -78,7 +78,7 @@ const brisbaneEvents = [
     title: "Late Night Selector Sessions",
     venue: "Warehouse 25",
     suburb: "Milton",
-    isoDate: addDaysToISO(todayISO, 2), // This weekend
+isoDate: "2026-11-07",
     timeString: "9:00 PM",
     category: "DJ nights",
     stickerClass: "sticker-dj",
@@ -93,7 +93,7 @@ const brisbaneEvents = [
     title: "Good Chat Standup & New Material",
     venue: "Good Chat Comedy Club",
     suburb: "Fortitude Valley",
-    isoDate: addDaysToISO(todayISO, 3), // Weekend
+isoDate: "2026-11-07",
     timeString: "7:00 PM",
     category: "Comedy",
     stickerClass: "sticker-comedy",
@@ -108,7 +108,7 @@ const brisbaneEvents = [
     title: "Sunday Jazz on the Green",
     venue: "Brisbane Powerhouse",
     suburb: "New Farm",
-    isoDate: addDaysToISO(todayISO, 4),
+isoDate: "2026-11-08",
     timeString: "3:30 PM",
     category: "Live music",
     stickerClass: "sticker-music",
@@ -123,7 +123,7 @@ const brisbaneEvents = [
     title: "Folk & Storytelling in the Yard",
     venue: "The Princess Theatre",
     suburb: "Woolloongabba",
-    isoDate: addDaysToISO(todayISO, 10),
+isoDate: "2026-11-14",
     timeString: "7:00 PM",
     category: "Live music",
     stickerClass: "sticker-music",
@@ -134,6 +134,89 @@ const brisbaneEvents = [
     ticketUrl: "#"
   }
 ];
+// 3 Permanent Featured Gigs (Always visible regardless of search/filter)
+const featuredEvents = [
+  {
+    id: 'feat-1',
+    title: "The Brightside Live: Indie Band Showcase",
+    venue: "The Brightside",
+    suburb: "Fortitude Valley",
+    isoDate: todayISO,
+    timeString: "7:30 PM",
+    category: "Live music",
+    stickerClass: "sticker-music",
+    initials: "BS",
+    price: 15,
+    priceDisplay: "AUD 15",
+    description: "Four emerging local indie-rock acts taking over the carpark stage for an intimate mid-week room.",
+    ticketUrl: "#"
+  },
+  {
+    id: 'feat-2',
+    title: "Good Chat Standup & New Material",
+    venue: "Good Chat Comedy Club",
+    suburb: "Fortitude Valley",
+    isoDate: addDaysToISO(todayISO, 2),
+    timeString: "7:00 PM",
+    category: "Comedy",
+    stickerClass: "sticker-comedy",
+    initials: "GC",
+    price: 20,
+    priceDisplay: "AUD 20",
+    description: "A hand-picked lineup of rising Brisbane comics plus a couple of unannounced touring headliners.",
+    ticketUrl: "#"
+  },
+  {
+    id: 'feat-3',
+    title: "Sunday Jazz on the Green",
+    venue: "Brisbane Powerhouse",
+    suburb: "New Farm",
+    isoDate: addDaysToISO(todayISO, 4),
+    timeString: "3:30 PM",
+    category: "Live music",
+    stickerClass: "sticker-music",
+    initials: "PH",
+    price: 0,
+    priceDisplay: "FREE",
+    description: "Free afternoon soul and jazz quartet by the river. Grab a rug or a cold drink on the lawn.",
+    ticketUrl: "#"
+  }
+];
+
+function renderFeatured() {
+  const featuredContainer = document.getElementById('featured-grid');
+  if (!featuredContainer) return;
+
+  featuredContainer.innerHTML = featuredEvents.map(event => {
+    const isFree = event.price === 0;
+    const priceBadge = isFree
+      ? `<span class="sticker-tag sticker-price is-free">FREE ENTRY</span>`
+      : `<span class="sticker-tag sticker-price">${event.priceDisplay}</span>`;
+
+    return `
+      <article class="gnm-card event-card">
+        <div class="card-visual">
+          <div class="card-visual-pattern" aria-hidden="true">${event.initials}</div>
+          <div class="card-badges">
+            <span class="sticker-tag ${event.stickerClass}">${event.category}</span>
+            ${priceBadge}
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="card-date-row">
+            ${formatEventDate(event.isoDate)} &middot; ${event.timeString}
+          </div>
+          <h3 class="card-title">${event.title}</h3>
+          <div class="card-venue">${event.venue} &middot; ${event.suburb}</div>
+          <p class="card-description">${event.description}</p>
+          <div class="card-footer">
+            <a href="${event.ticketUrl}" class="card-action-link">View event &amp; tickets &mdash;&gt;</a>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join('');
+}
 
 // 3. State Management
 let currentFilter = 'all';
@@ -183,7 +266,7 @@ function filterEvents() {
 
         if (!eventMatchesSelectedDate(event)) return false;
 
-    // Fast-tap Filter Chip matching
+    // 6. Fast-tap Filter Chip matching
     switch (currentFilter) {
       case 'tonight':
         return event.isoDate === todayISO;
@@ -204,63 +287,226 @@ function filterEvents() {
   });
 }
 
-// 6. Card Rendering (Following the 16:9 Architecture Spec)
+// Escape text before inserting it into HTML.
+function escapeEventText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[character]);
+}
+
 function renderEvents() {
-  const filtered = filterEvents();
+  const resultsStartDate = "2026-11-01";
 
-  // Update status count
-  countLabel.textContent = `Showing ${filtered.length} ${filtered.length === 1 ? 'gig' : 'gigs'} in Brisbane`;
+  const filtered = filterEvents()
+    .filter((event) => event.isoDate >= resultsStartDate)
+    .sort((first, second) => {
+      return (
+        first.isoDate.localeCompare(second.isoDate) ||
+        first.title.localeCompare(second.title, "en-AU", {
+          sensitivity: "base"
+        })
+      );
+    });
 
-  // Show/hide reset button
-  const hasActiveFilters = currentFilter !== 'all' || searchQuery.trim() !== '';
-  resetBtn.hidden = !hasActiveFilters;
+  countLabel.textContent =
+    `Showing ${filtered.length} ${
+      filtered.length === 1 ? "event" : "events"
+    } in Brisbane`;
 
-  // Empty state handling
+  resetBtn.hidden =
+    currentFilter === "all" &&
+    searchQuery.trim() === "";
+
   if (filtered.length === 0) {
     eventsGrid.innerHTML = `
       <div class="no-results-box">
-        <h3>No gigs found matching your search</h3>
-        <p>Try searching for a different suburb, band name, or resetting your filter chips.</p>
-        <button type="button" class="btn btn-secondary" onclick="resetAllFilters()">Clear all filters</button>
+        <h3>No matching events from November onwards</h3>
+        <p>Try a different search or clear your filters.</p>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          onclick="resetAllFilters()"
+        >
+          Clear all filters
+        </button>
       </div>
     `;
     return;
   }
 
-  // Render cards
-  eventsGrid.innerHTML = filtered.map(event => {
-    const isFree = event.price === 0;
-    const priceBadge = isFree
-      ? `<span class="sticker-tag sticker-price is-free">FREE ENTRY</span>`
-      : `<span class="sticker-tag sticker-price">${event.priceDisplay}</span>`;
+  const months = new Map();
 
-    return `
-      <article class="gnm-card event-card">
-        <!-- 16:9 Visual Container with Venue Monogram & Sticker Badges -->
-        <div class="card-visual">
-          <div class="card-visual-pattern" aria-hidden="true">${event.initials}</div>
-          <div class="card-badges">
-            <span class="sticker-tag ${event.stickerClass}">${event.category}</span>
-            ${priceBadge}
-          </div>
-        </div>
+  filtered.forEach((event) => {
+    const monthKey = event.isoDate.slice(0, 7);
 
-        <!-- Card Content Body -->
-        <div class="card-content">
-          <div class="card-date-row">
-            ${formatEventDate(event.isoDate)} &middot; ${event.timeString}
-          </div>
-          <h3 class="card-title">${event.title}</h3>
-          <div class="card-venue">${event.venue} &middot; ${event.suburb}</div>
-          <p class="card-description">${event.description}</p>
-          
-          <div class="card-footer">
-            <a href="${event.ticketUrl}" class="card-action-link">View event &amp; tickets &mdash;&gt;</a>
-          </div>
-        </div>
-      </article>
-    `;
-  }).join('');
+    if (!months.has(monthKey)) {
+      months.set(monthKey, []);
+    }
+
+    months.get(monthKey).push(event);
+  });
+
+  eventsGrid.innerHTML = Array.from(months)
+    .map(([monthKey, monthEvents]) => {
+      const [year, month] = monthKey.split("-").map(Number);
+      const monthDate = new Date(Date.UTC(year, month - 1, 1));
+
+      const monthHeading = monthDate.toLocaleDateString("en-AU", {
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC"
+      });
+
+      const rows = monthEvents.map((event) => {
+        const [eventYear, eventMonth, eventDay] =
+          event.isoDate.split("-").map(Number);
+
+        const date = new Date(
+          Date.UTC(eventYear, eventMonth - 1, eventDay)
+        );
+
+        const weekday = date.toLocaleDateString("en-AU", {
+          weekday: "short",
+          timeZone: "UTC"
+        }).toUpperCase();
+
+        const shortMonth = date.toLocaleDateString("en-AU", {
+          month: "short",
+          timeZone: "UTC"
+        }).toUpperCase();
+
+        const fullDate = date.toLocaleDateString("en-AU", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+          timeZone: "UTC"
+        });
+
+        const isFree = event.price === 0;
+        const title = escapeEventText(event.title);
+        const venue = escapeEventText(event.venue);
+        const suburb = escapeEventText(event.suburb);
+        const category = escapeEventText(event.category);
+
+        const price = isFree
+          ? "FREE ENTRY"
+          : escapeEventText(event.priceDisplay);
+
+        const categoryClass = [
+          "sticker-music",
+          "sticker-comedy",
+          "sticker-dj",
+          "sticker-openmic"
+        ].includes(event.stickerClass)
+          ? event.stickerClass
+          : "sticker-openmic";
+
+        const timeLabel = event.doorsTime
+          ? `Doors ${escapeEventText(event.doorsTime)}`
+          : `Start ${escapeEventText(event.timeString)}`;
+
+        const thumbnail = event.imageUrl
+          ? `
+            <img
+              src="${escapeEventText(event.imageUrl)}"
+              alt="${escapeEventText(event.imageAlt || "")}"
+              width="120"
+              height="80"
+              loading="lazy"
+            >
+          `
+          : `
+            <span aria-hidden="true">
+              ${escapeEventText(event.initials)}
+            </span>
+          `;
+
+        // Only genuine HTTPS destinations become ticket links.
+        const ticketUrl = /^https:\/\//i.test(event.ticketUrl || "")
+          ? event.ticketUrl
+          : null;
+
+        const action = isFree
+          ? `<span class="event-row-free">Free</span>`
+          : ticketUrl
+            ? `
+              <a
+                class="event-row-action"
+                href="${escapeEventText(ticketUrl)}"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Tickets for ${title} (opens in a new tab)"
+              >
+                Tickets <span aria-hidden="true">→</span>
+              </a>
+            `
+            : `
+              <span
+                class="event-row-action is-unavailable"
+                aria-disabled="true"
+                title="Ticket link not added yet"
+              >
+                Tickets
+              </span>
+            `;
+
+        return `
+          <article class="event-row">
+            <time
+              class="event-row-date"
+              datetime="${event.isoDate}"
+              aria-label="${escapeEventText(fullDate)}"
+            >
+              <span>${weekday}</span>
+              <strong>${String(eventDay).padStart(2, "0")}</strong>
+              <span>${shortMonth}</span>
+            </time>
+
+            <div class="event-row-thumbnail">
+              ${thumbnail}
+            </div>
+
+            <div class="event-row-info">
+              <div class="event-row-tags">
+                <span class="sticker-tag ${categoryClass}">
+                  ${category}
+                </span>
+                <span aria-hidden="true">·</span>
+                <span class="sticker-tag sticker-price ${
+                  isFree ? "is-free" : ""
+                }">
+                  ${price}
+                </span>
+              </div>
+
+              <h3 class="event-row-title">${title}</h3>
+
+              <p class="event-row-meta">
+                ${venue} · ${suburb} · ${timeLabel}
+              </p>
+            </div>
+
+            <div class="event-row-action-slot">
+              ${action}
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      return `
+        <section class="event-month">
+          <h3 class="event-month-heading">
+            ${escapeEventText(monthHeading)}
+          </h3>
+          <div class="event-month-list">${rows}</div>
+        </section>
+      `;
+    }).join("");
 }
 
 // 7. Event Handlers
@@ -676,3 +922,4 @@ dateApplyButton.addEventListener("click", () => {
 updateDatePresetCounts();
 renderCalendar();
 updateDateFooter();
+renderFeatured();
