@@ -1237,4 +1237,119 @@ a.event-row-action:hover {
     grid-column: 4;
     text-align: right;
   }
+}/* Event list action buttons and alignment fixes */
+.event-row-action-slot {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.event-row-action {
+  justify-content: center;
+  min-width: 92px;
+  min-height: 44px;
+  padding: 10px 14px;
+  background: var(--cobalt);
+  border: 1.5px solid var(--cobalt);
+  border-radius: 4px;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.event-row-action:hover {
+  background: var(--cobalt-hover);
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+.event-row-action.is-unavailable {
+  background: var(--cobalt);
+  border-color: var(--cobalt);
+  color: #FFFFFF;
+  opacity: 0.65;
+}
+
+/* Keep the date block centred on both desktop and mobile. */
+.event-row-date {
+  justify-content: center;
+  text-align: center;
+  width: 44px;
+}
+
+/* Desktop: keep Tickets flush to the right edge of each row. */
+@media (min-width: 800px) {
+  .event-row-action-slot {
+    justify-self: end;
+    width: 100%;
+  }
+}
+
+/* Mobile: keep the date centred and Tickets aligned to the right below event details. */
+@media (max-width: 799px) {
+  .event-row {
+    grid-template-columns: 44px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .event-row-date {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: stretch;
+  }
+
+  .event-row-action-slot {
+    grid-column: 2;
+    grid-row: 2;
+    justify-content: flex-end;
+    margin-top: 2px;
+  }
+
+  .event-row-info {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+/* Smaller Tickets buttons — exact brand cobalt */
+.event-row-action,
+.event-row-action:hover,
+.event-row-action.is-unavailable {
+  min-width: 0;
+  min-height: 34px;
+  padding: 6px 10px;
+  background: #1A4BFF;
+  border: 1px solid #1A4BFF;
+  color: #FFFFFF;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: 1;
+}
+/* Tickets buttons — tactile shadow matching the main CTA */
+.event-row-action {
+  background: #1A4BFF;
+  color: #FFFFFF;
+  box-shadow: var(--shadow-tactile);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+a.event-row-action:hover {
+  background: #1A4BFF;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--ink-primary);
+}
+
+a.event-row-action:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+/* Placeholder buttons have a shadow but no click effect. */
+.event-row-action.is-unavailable {
+  box-shadow: var(--shadow-tactile);
+  transform: none;
 }

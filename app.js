@@ -426,34 +426,38 @@ function renderEvents() {
             </span>
           `;
 
-        // Only genuine HTTPS destinations become ticket links.
-        const ticketUrl = /^https:\/\//i.test(event.ticketUrl || "")
-          ? event.ticketUrl
+                // Free events can link to event information; paid events link to tickets.
+        const destination = isFree
+          ? event.eventUrl || event.ticketUrl
+          : event.ticketUrl;
+
+        const validUrl = /^https:\/\//i.test(destination || "")
+          ? destination
           : null;
 
-        const action = isFree
-          ? `<span class="event-row-free">Free</span>`
-          : ticketUrl
-            ? `
-              <a
-                class="event-row-action"
-                href="${escapeEventText(ticketUrl)}"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Tickets for ${title} (opens in a new tab)"
-              >
-                Tickets <span aria-hidden="true">→</span>
-              </a>
-            `
-            : `
-              <span
-                class="event-row-action is-unavailable"
-                aria-disabled="true"
-                title="Ticket link not added yet"
-              >
-                Tickets
-              </span>
-            `;
+        const buttonLabel = isFree ? "Free" : "Tickets";
+
+        const action = validUrl
+          ? `
+            <a
+              class="event-row-action"
+              href="${escapeEventText(validUrl)}"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="${isFree ? "Information" : "Tickets"} for ${title} (opens in a new tab)"
+            >
+              ${buttonLabel} <span aria-hidden="true">→</span>
+            </a>
+          `
+          : `
+            <span
+              class="event-row-action is-unavailable"
+              aria-disabled="true"
+              title="Event link not added yet"
+            >
+              ${buttonLabel}
+            </span>
+          `;
 
         return `
           <article class="event-row">
@@ -477,9 +481,7 @@ function renderEvents() {
                   ${category}
                 </span>
                 <span aria-hidden="true">·</span>
-                <span class="sticker-tag sticker-price ${
-                  isFree ? "is-free" : ""
-                }">
+                <span class="sticker-tag sticker-price ${isFree ? "is-free" : ""}">
                   ${price}
                 </span>
               </div>
@@ -524,7 +526,7 @@ filterChips.forEach(chip => {
       c.setAttribute('aria-pressed', 'false');
     });
 
-    chip.classList.add('is-active');
+        chip.classList.add('is-active');
     chip.setAttribute('aria-pressed', 'true');
     currentFilter = chip.dataset.filter;
     renderEvents();
@@ -868,6 +870,7 @@ function chooseCalendarDate(isoDate) {
 
   renderCalendar();
   updateDateFooter();
+  renderEvents();
 }
 
 function selectDatePreset(preset, label) {
@@ -885,8 +888,9 @@ function selectDatePreset(preset, label) {
     button.setAttribute("aria-pressed", String(isSelected));
   });
 
-  renderCalendar();
+   renderCalendar();
   updateDateFooter();
+  renderEvents();
 }
 
 document.querySelectorAll(".preset-btn").forEach((button) => {
@@ -912,11 +916,13 @@ dateClearButton.addEventListener("click", () => {
   rangeToggle.checked = false;
   selectDatePreset("anytime", "Anytime");
 });
-dateApplyButton.addEventListener("click", () => {
-  renderEvents();
-  closeDatePicker();
-  dateTriggerButton.focus();
-});
+if (dateApplyButton) {
+  dateApplyButton.addEventListener("click", () => {
+    renderEvents();
+    closeDatePicker();
+    dateTriggerButton.focus();
+  });
+}
 
 // First calendar render
 updateDatePresetCounts();
