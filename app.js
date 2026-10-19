@@ -911,3 +911,29 @@ if (mainClearBtn) {
   });
 }
 loadLiveEvents();
+// Make Featured cards and event rows clickable
+document.addEventListener('click', (event) => {
+  const card = event.target.closest(
+    '#featured-grid .event-card, #events-grid .event-row'
+  );
+
+  if (!card) return;
+
+  // Leave existing links and controls working normally
+  if (event.target.closest('a, button, input, select, label')) return;
+
+  // Let people select and copy text without opening tickets
+  if (window.getSelection()?.toString().trim()) return;
+
+  const ticketLink = card.querySelector(
+    'a.card-action-link, a.event-row-action'
+  );
+
+  if (!ticketLink) return;
+
+  const destination = new URL(ticketLink.href, window.location.href);
+  if (!['https:', 'http:'].includes(destination.protocol)) return;
+  if (ticketLink.getAttribute('href') === '#') return;
+
+  window.open(destination.href, '_blank', 'noopener,noreferrer');
+});
