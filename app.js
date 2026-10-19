@@ -1,6 +1,7 @@
-// ========================================================
 // GIGS NEAR ME — BRISBANE EVENT ENGINE (VERSION 2.0)
-// ========================================================
+// Live Data via Google Sheets "Published" tab
+
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1Zv0uvaoHneYxbnD3XKkh6aFc8U_wh9gYL9YI2V-lUw8/gviz/tq?tqx=out:csv&sheet=Published';
 
 // 1. Timezone-aware date calculations (Australia/Brisbane)
 function getBrisbaneDateParts() {
@@ -11,7 +12,6 @@ function getBrisbaneDateParts() {
     day: '2-digit',
     weekday: 'short'
   });
-  
   const parts = formatter.formatToParts(new Date());
   const map = {};
   parts.forEach(p => map[p.type] = p.value);
@@ -29,160 +29,158 @@ function addDaysToISO(isoString, days) {
   return date.toISOString().split('T')[0];
 }
 
-const todayISO = getBrisbaneTodayISO();
-
-// Format date into brand layout: "THU 15 OCT"
 function formatEventDate(isoString) {
   const [y, m, d] = isoString.split('-').map(Number);
   const date = new Date(Date.UTC(y, m - 1, d));
   const weekday = date.toLocaleDateString('en-AU', { weekday: 'short', timeZone: 'UTC' }).toUpperCase();
-  const dayNum = date.toLocaleDateString('en-AU', { day: '2-digit', timeZone: 'UTC' });
+  const day = date.toLocaleDateString('en-AU', { day: '2-digit', timeZone: 'UTC' });
   const month = date.toLocaleDateString('en-AU', { month: 'short', timeZone: 'UTC' }).toUpperCase();
-  return `${weekday} ${dayNum} ${month}`;
+  return `${weekday} ${day} ${month}`;
 }
 
-// 2. Demonstration event dataset (clearly labelled for testing)
-const brisbaneEvents = [
-  {
-    id: 1,
-    title: "The Brightside Live: Indie Band Showcase",
-    venue: "The Brightside",
-    suburb: "Fortitude Valley",
-    isoDate: "2026-11-01",
-    timeString: "7:30 PM",
-    category: "Live music",
-    stickerClass: "sticker-music",
-    initials: "BS",
-    price: 15,
-    priceDisplay: "AUD 15",
-    description: "Four emerging local indie-rock acts taking over the carpark stage for an intimate mid-week room.",
-    ticketUrl: "#"
-  },
-  {
-    id: 2,
-    title: "Boundary Street Acoustic & Open Mic",
-    venue: "The Burrow",
-    suburb: "West End",
-isoDate: "2026-11-01",
-    timeString: "6:30 PM",
-    category: "Open mic",
-    stickerClass: "sticker-openmic",
-    initials: "TB",
-    price: 0,
-    priceDisplay: "FREE",
-    description: "Walk-in acoustic slots, warm hospitality, and good local songwriters testing out fresh material.",
-    ticketUrl: "#"
-  },
-  {
-    id: 3,
-    title: "Late Night Selector Sessions",
-    venue: "Warehouse 25",
-    suburb: "Milton",
-isoDate: "2026-11-07",
-    timeString: "9:00 PM",
-    category: "DJ nights",
-    stickerClass: "sticker-dj",
-    initials: "W25",
-    price: 10,
-    priceDisplay: "AUD 10",
-    description: "Deep house, garage, and vinyl club rhythms featuring local crate-diggers in the barrel room.",
-    ticketUrl: "#"
-  },
-  {
-    id: 4,
-    title: "Good Chat Standup & New Material",
-    venue: "Good Chat Comedy Club",
-    suburb: "Fortitude Valley",
-isoDate: "2026-11-07",
-    timeString: "7:00 PM",
-    category: "Comedy",
-    stickerClass: "sticker-comedy",
-    initials: "GC",
-    price: 20,
-    priceDisplay: "AUD 20",
-    description: "A hand-picked lineup of rising Brisbane comics plus a couple of unannounced touring headliners.",
-    ticketUrl: "#"
-  },
-  {
-    id: 5,
-    title: "Sunday Jazz on the Green",
-    venue: "Brisbane Powerhouse",
-    suburb: "New Farm",
-isoDate: "2026-11-08",
-    timeString: "3:30 PM",
-    category: "Live music",
-    stickerClass: "sticker-music",
-    initials: "PH",
-    price: 0,
-    priceDisplay: "FREE",
-    description: "Free afternoon soul and jazz quartet by the river. Grab a rug or a cold drink on the lawn.",
-    ticketUrl: "#"
-  },
-  {
-    id: 6,
-    title: "Folk & Storytelling in the Yard",
-    venue: "The Princess Theatre",
-    suburb: "Woolloongabba",
-isoDate: "2026-11-14",
-    timeString: "7:00 PM",
-    category: "Live music",
-    stickerClass: "sticker-music",
-    initials: "PT",
-    price: 12,
-    priceDisplay: "AUD 12",
-    description: "Low-key acoustic sessions, narrative songwriters, and local cider under the fairy lights.",
-    ticketUrl: "#"
-  }
-];
-// 3 Permanent Featured Gigs (Always visible regardless of search/filter)
-const featuredEvents = [
-  {
-    id: 'feat-1',
-    title: "The Brightside Live: Indie Band Showcase",
-    venue: "The Brightside",
-    suburb: "Fortitude Valley",
-    isoDate: todayISO,
-    timeString: "7:30 PM",
-    category: "Live music",
-    stickerClass: "sticker-music",
-    initials: "BS",
-    price: 15,
-    priceDisplay: "AUD 15",
-    description: "Four emerging local indie-rock acts taking over the carpark stage for an intimate mid-week room.",
-    ticketUrl: "#"
-  },
-  {
-    id: 'feat-2',
-    title: "Good Chat Standup & New Material",
-    venue: "Good Chat Comedy Club",
-    suburb: "Fortitude Valley",
-    isoDate: addDaysToISO(todayISO, 2),
-    timeString: "7:00 PM",
-    category: "Comedy",
-    stickerClass: "sticker-comedy",
-    initials: "GC",
-    price: 20,
-    priceDisplay: "AUD 20",
-    description: "A hand-picked lineup of rising Brisbane comics plus a couple of unannounced touring headliners.",
-    ticketUrl: "#"
-  },
-  {
-    id: 'feat-3',
-    title: "Sunday Jazz on the Green",
-    venue: "Brisbane Powerhouse",
-    suburb: "New Farm",
-    isoDate: addDaysToISO(todayISO, 4),
-    timeString: "3:30 PM",
-    category: "Live music",
-    stickerClass: "sticker-music",
-    initials: "PH",
-    price: 0,
-    priceDisplay: "FREE",
-    description: "Free afternoon soul and jazz quartet by the river. Grab a rug or a cold drink on the lawn.",
-    ticketUrl: "#"
-  }
-];
+const todayISO = getBrisbaneTodayISO();
 
+// CSV Parser
+function parseCSV(csvText) {
+  const rows = [];
+  let row = [];
+  let value = '';
+  let insideQuotes = false;
+
+  for (let i = 0; i < csvText.length; i++) {
+    const char = csvText[i];
+    const next = csvText[i + 1];
+
+    if (char === '"') {
+      if (insideQuotes && next === '"') {
+        value += '"';
+        i++;
+      } else {
+        insideQuotes = !insideQuotes;
+      }
+    } else if (char === ',' && !insideQuotes) {
+      row.push(value.trim());
+      value = '';
+    } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+      if (char === '\r' && next === '\n') i++;
+      row.push(value.trim());
+      if (row.some(c => c !== '')) rows.push(row);
+      row = [];
+      value = '';
+    } else {
+      value += char;
+    }
+  }
+  if (value || row.length) {
+    row.push(value.trim());
+    rows.push(row);
+  }
+  if (rows.length < 2) return [];
+
+  const headers = rows[0].map(h => h.replace(/^\uFEFF/, '').trim());
+  return rows.slice(1).map(cells => {
+    const obj = {};
+    headers.forEach((h, idx) => {
+      obj[h] = (cells[idx] || '').trim();
+    });
+    return obj;
+  });
+}
+
+function normaliseDateToISO(value) {
+  if (!value) return '';
+  const cleaned = String(value).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(cleaned)) return cleaned;
+  const match = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (match) {
+    return `${match[3]}-${String(match[2]).padStart(2, '0')}-${String(match[1]).padStart(2, '0')}`;
+  }
+  const parsed = new Date(cleaned);
+  if (isNaN(parsed.getTime())) return '';
+  return `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, '0')}-${String(parsed.getDate()).padStart(2, '0')}`;
+}
+
+function getStickerClass(category) {
+  const val = String(category || '').toLowerCase();
+  if (val.includes('comedy')) return 'sticker-comedy';
+  if (val.includes('dj') || val.includes('club')) return 'sticker-dj';
+  if (val.includes('open')) return 'sticker-openmic';
+  if (val.includes('theatre') || val.includes('art')) return 'sticker-arts';
+  return 'sticker-music';
+}
+
+function getPriceValue(exactPrice, priceTier) {
+  const val = String(exactPrice || priceTier || '').toLowerCase();
+  if (val.includes('free')) return 0;
+  const match = val.match(/(\d+(?:\.\d+)?)/);
+  return match ? Number(match[1]) : null;
+}
+
+function getPriceDisplay(exactPrice, priceTier) {
+  const exact = String(exactPrice || '').trim();
+  const tier = String(priceTier || '').trim();
+  if (exact) {
+    if (/free/i.test(exact)) return 'FREE ENTRY';
+    if (/aud/i.test(exact)) return exact;
+    if (/^\d+(?:\.\d{1,2})?$/.test(exact)) return `AUD ${exact}`;
+    return exact;
+  }
+  if (/free/i.test(tier)) return 'FREE ENTRY';
+  return tier || 'See venue';
+}
+
+function getValidEventLink(ticketUrl, officialUrl) {
+  const t = String(ticketUrl || '').trim();
+  const o = String(officialUrl || '').trim();
+  if (/^https?:\/\//i.test(t)) return t;
+  if (/^https?:\/\//i.test(o)) return o;
+  return '#';
+}
+
+function venueInitials(venueName) {
+  const words = String(venueName || 'TBA').replace(/[^\w\s]/g, '').split(/\s+/).filter(Boolean);
+  return words.slice(0, 2).map(w => w.charAt(0)).join('').toUpperCase() || 'GN';
+}
+
+// Global Event Arrays
+let brisbaneEvents = [];
+let featuredEvents = [];
+
+function escapeEventText(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+// Automatically build the Suburb dropdown from live sheet data
+function populateSuburbDropdown() {
+  const suburbSelect = document.getElementById('filter-suburb');
+  if (!suburbSelect) return;
+
+  const currentSelection = suburbSelect.value;
+
+  // Extract unique suburbs from loaded events
+  const suburbs = Array.from(
+    new Set(
+      brisbaneEvents
+        .map(e => e.suburb)
+        .filter(s => s && s.trim() !== '')
+    )
+  ).sort((a, b) => a.localeCompare(b));
+
+  // Build the option elements
+  suburbSelect.innerHTML = '<option value="all">All suburbs</option>' +
+    suburbs.map(s => `<option value="${escapeEventText(s)}">${escapeEventText(s)}</option>`).join('');
+
+  // Keep the user's current selection if it still exists
+  if (suburbs.includes(currentSelection)) {
+    suburbSelect.value = currentSelection;
+  } else {
+    suburbSelect.value = 'all';
+  }
+}
+
+// 2. Render Featured Gigs (Matches original markup & classes)
 function renderFeatured() {
   const featuredContainer = document.getElementById('featured-grid');
   if (!featuredContainer) return;
@@ -191,26 +189,26 @@ function renderFeatured() {
     const isFree = event.price === 0;
     const priceBadge = isFree
       ? `<span class="sticker-tag sticker-price is-free">FREE ENTRY</span>`
-      : `<span class="sticker-tag sticker-price">${event.priceDisplay}</span>`;
+      : `<span class="sticker-tag sticker-price">${escapeEventText(event.priceDisplay)}</span>`;
 
     return `
       <article class="gnm-card event-card">
         <div class="card-visual">
-          <div class="card-visual-pattern" aria-hidden="true">${event.initials}</div>
+          <div class="card-visual-pattern" aria-hidden="true">${escapeEventText(event.initials)}</div>
           <div class="card-badges">
-            <span class="sticker-tag ${event.stickerClass}">${event.category}</span>
+            <span class="sticker-tag ${escapeEventText(event.stickerClass)}">${escapeEventText(event.category)}</span>
             ${priceBadge}
           </div>
         </div>
         <div class="card-content">
           <div class="card-date-row">
-            ${formatEventDate(event.isoDate)} &middot; ${event.timeString}
+            ${formatEventDate(event.isoDate)} &middot; ${escapeEventText(event.doorsTime ? 'Doors ' + event.doorsTime : event.timeString)}
           </div>
-          <h3 class="card-title">${event.title}</h3>
-          <div class="card-venue">${event.venue} &middot; ${event.suburb}</div>
-          <p class="card-description">${event.description}</p>
+          <h3 class="card-title">${escapeEventText(event.title)}</h3>
+          <div class="card-venue">${escapeEventText(event.venue)} &middot; ${escapeEventText(event.suburb)}</div>
+          <p class="card-description">${escapeEventText(event.description)}</p>
           <div class="card-footer">
-            <a href="${event.ticketUrl}" class="card-action-link">View event &amp; tickets &mdash;&gt;</a>
+            <a href="${escapeEventText(event.ticketUrl)}" target="_blank" rel="noopener noreferrer" class="card-action-link">View event &amp; tickets &mdash;&gt;</a>
           </div>
         </div>
       </article>
@@ -219,9 +217,9 @@ function renderFeatured() {
 }
 
 // 3. State Management
-let currentFilter = 'all';
+let currentFilter = 'this-week'; // Option B: Default to current week
 let searchQuery = '';
-let selectedDatePreset = "anytime";
+let selectedDatePreset = "this-week";
 let selectedSingleDate = null;
 let selectedRangeStart = null;
 let selectedRangeEnd = null;
@@ -235,26 +233,82 @@ const filterChips = document.querySelectorAll('.filter-chip');
 const newsletterForm = document.getElementById('newsletter-form');
 const newsletterFeedback = document.getElementById('newsletter-feedback');
 
-// 4. Weekend calculation helper
+// 4. Weekend and Week calculation helpers
 function isThisWeekend(isoDate) {
   const [y, m, d] = todayISO.split('-').map(Number);
   const now = new Date(Date.UTC(y, m - 1, d));
   const dayOfWeek = now.getUTCDay(); // 0 is Sun, 5 is Fri, 6 is Sat
-
-  // Days until Friday
   const diffToFriday = (5 - dayOfWeek + 7) % 7;
   const fridayISO = addDaysToISO(todayISO, diffToFriday);
   const sundayISO = addDaysToISO(fridayISO, 2);
-
   return isoDate >= fridayISO && isoDate <= sundayISO;
+}
+
+function getThisWeekEndISO() {
+  const [y, m, d] = todayISO.split('-').map(Number);
+  const now = new Date(Date.UTC(y, m - 1, d));
+  const dayOfWeek = now.getUTCDay(); // 0 Sun, 1 Mon ... 6 Sat
+  const daysUntilSunday = (7 - dayOfWeek) % 7;
+  return addDaysToISO(todayISO, daysUntilSunday);
 }
 
 // 5. Filter & Search Logic
 function filterEvents() {
   const cleanQuery = searchQuery.trim().toLowerCase();
 
+  const selectedSuburb =
+    document.getElementById('filter-suburb')?.value || 'all';
+  const selectedType =
+    document.getElementById('filter-type')?.value || 'all';
+  const selectedPrice =
+    document.getElementById('filter-price')?.value || 'all';
+
   return brisbaneEvents.filter(event => {
-    // Search Matching (title, venue, suburb, category, description)
+    // Suburb filter
+    if (
+      selectedSuburb !== 'all' &&
+      event.suburb.toLowerCase() !== selectedSuburb.toLowerCase()
+    ) {
+      return false;
+    }
+
+    // Event type filter
+    if (selectedType !== 'all') {
+      const typeLower = selectedType.toLowerCase();
+      const categoryLower = event.category.toLowerCase();
+
+      if (
+        !categoryLower.includes(typeLower) &&
+        !typeLower.includes(categoryLower)
+      ) {
+        return false;
+      }
+    }
+
+    // Price filter
+    if (selectedPrice === 'free' && event.price !== 0) return false;
+
+    if (
+      selectedPrice === 'under-15' &&
+      (event.price === null || event.price >= 15)
+    ) return false;
+
+    if (
+      selectedPrice === '15-30' &&
+      (event.price === null || event.price < 15 || event.price > 30)
+    ) return false;
+
+    if (
+      selectedPrice === '30-50' &&
+      (event.price === null || event.price < 30 || event.price > 50)
+    ) return false;
+
+    if (
+      selectedPrice === '50-plus' &&
+      (event.price === null || event.price < 50)
+    ) return false;
+
+    // Search query matching
     const matchesSearch = cleanQuery === '' ||
       event.title.toLowerCase().includes(cleanQuery) ||
       event.venue.toLowerCase().includes(cleanQuery) ||
@@ -264,89 +318,115 @@ function filterEvents() {
 
     if (!matchesSearch) return false;
 
-        if (!eventMatchesSelectedDate(event)) return false;
+    // Fast-tap chips
+    let matchesChip = true;
+    if (
+  !cleanQuery &&
+  !selectedSingleDate &&
+  !selectedRangeStart &&
+  selectedDatePreset === 'this-week' &&
+  selectedSuburb === 'all' &&
+  selectedType === 'all' &&
+  selectedPrice === 'all'
+) {
+      if (currentFilter === 'this-week') {
+        matchesChip = event.isoDate >= todayISO && event.isoDate <= getThisWeekEndISO();
+      } else if (currentFilter === 'tonight') {
+        matchesChip = event.isoDate === todayISO;
+      } else if (currentFilter === 'weekend') {
+        matchesChip = isThisWeekend(event.isoDate);
+      } else if (currentFilter === 'free') {
+        matchesChip = event.price === 0;
+      } else if (currentFilter === 'music') {
+        matchesChip = /music|dj|open mic/i.test(event.category);
+      } else if (currentFilter === 'comedy') {
+        matchesChip = /comedy/i.test(event.category);
+      } else if (currentFilter === 'under-20') {
+        matchesChip = event.price !== null && event.price <= 20;
+      } else if (currentFilter === 'all') {
+        matchesChip = event.isoDate >= todayISO;
+      }
+    }
+    if (!matchesChip) return false;
 
-    // 6. Fast-tap Filter Chip matching
-    switch (currentFilter) {
+        // Date picker filtering
+    if (event.isoDate < todayISO) return false;
+
+    if (selectedRangeStart) {
+      const rangeEnd = selectedRangeEnd || selectedRangeStart;
+      return event.isoDate >= selectedRangeStart &&
+        event.isoDate <= rangeEnd;
+    }
+
+    if (selectedSingleDate) {
+      return event.isoDate === selectedSingleDate;
+    }
+
+    // Search and non-date filters look across upcoming events
+    // unless the user has explicitly selected a date.
+    const hasDiscoveryFilter =
+      cleanQuery !== '' ||
+      selectedSuburb !== 'all' ||
+      selectedType !== 'all' ||
+      selectedPrice !== 'all' ||
+      ['free', 'music', 'comedy', 'under-20', 'all'].includes(currentFilter);
+
+    if (selectedDatePreset === 'this-week' && hasDiscoveryFilter) {
+      return true;
+    }
+
+    switch (selectedDatePreset) {
       case 'tonight':
+      case 'today':
         return event.isoDate === todayISO;
+
+      case 'tomorrow':
+        return event.isoDate === addDaysToISO(todayISO, 1);
+
+      case 'this-weekend':
       case 'weekend':
         return isThisWeekend(event.isoDate);
-      case 'free':
-        return event.price === 0;
-      case 'music':
-        return event.category === 'Live music';
-      case 'comedy':
-        return event.category === 'Comedy';
-      case 'under-20':
-        return event.price <= 20;
-      case 'all':
+
+      case 'this-week':
+        return event.isoDate <= getThisWeekEndISO();
+
+      case 'next-7-days':
+        return event.isoDate <= addDaysToISO(todayISO, 6);
+
+      case 'next-30-days':
+        return event.isoDate <= addDaysToISO(todayISO, 29);
+
+      case 'anytime':
       default:
         return true;
     }
   });
 }
 
-// Escape text before inserting it into HTML.
-function escapeEventText(value) {
-  return String(value ?? "").replace(/[&<>"']/g, (character) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  })[character]);
-}
-
+// 6. Render Events (Exact Original Classes & Markup)
 function renderEvents() {
-  const resultsStartDate = "2026-11-01";
+  if (!eventsGrid) return;
+  const filtered = filterEvents();
 
-  const filtered = filterEvents()
-    .filter((event) => event.isoDate >= resultsStartDate)
-    .sort((first, second) => {
-      return (
-        first.isoDate.localeCompare(second.isoDate) ||
-        first.title.localeCompare(second.title, "en-AU", {
-          sensitivity: "base"
-        })
-      );
-    });
-
-  countLabel.textContent =
-    `Showing ${filtered.length} ${
-      filtered.length === 1 ? "event" : "events"
-    } in Brisbane`;
-
-  resetBtn.hidden =
-    currentFilter === "all" &&
-    searchQuery.trim() === "";
+  if (countLabel) {
+    countLabel.textContent = `${filtered.length} ${filtered.length === 1 ? 'gig' : 'gigs'} found`;
+  }
 
   if (filtered.length === 0) {
     eventsGrid.innerHTML = `
-      <div class="no-results-box">
-        <h3>No matching events from November onwards</h3>
-        <p>Try a different search or clear your filters.</p>
-        <button
-          type="button"
-          class="btn btn-secondary"
-          onclick="resetAllFilters()"
-        >
-          Clear all filters
-        </button>
+      <div class="empty-state">
+        <p>No gigs match that filter yet.</p>
+        <button type="button" class="btn-reset" onclick="resetAllFilters()">Reset filters</button>
       </div>
     `;
     return;
   }
 
+  // Group by month
   const months = new Map();
-
   filtered.forEach((event) => {
     const monthKey = event.isoDate.slice(0, 7);
-
-    if (!months.has(monthKey)) {
-      months.set(monthKey, []);
-    }
-
+    if (!months.has(monthKey)) months.set(monthKey, []);
     months.get(monthKey).push(event);
   });
 
@@ -354,7 +434,6 @@ function renderEvents() {
     .map(([monthKey, monthEvents]) => {
       const [year, month] = monthKey.split("-").map(Number);
       const monthDate = new Date(Date.UTC(year, month - 1, 1));
-
       const monthHeading = monthDate.toLocaleDateString("en-AU", {
         month: "long",
         year: "numeric",
@@ -362,23 +441,10 @@ function renderEvents() {
       });
 
       const rows = monthEvents.map((event) => {
-        const [eventYear, eventMonth, eventDay] =
-          event.isoDate.split("-").map(Number);
-
-        const date = new Date(
-          Date.UTC(eventYear, eventMonth - 1, eventDay)
-        );
-
-        const weekday = date.toLocaleDateString("en-AU", {
-          weekday: "short",
-          timeZone: "UTC"
-        }).toUpperCase();
-
-        const shortMonth = date.toLocaleDateString("en-AU", {
-          month: "short",
-          timeZone: "UTC"
-        }).toUpperCase();
-
+        const [eventYear, eventMonth, eventDay] = event.isoDate.split("-").map(Number);
+        const date = new Date(Date.UTC(eventYear, eventMonth - 1, eventDay));
+        const weekday = date.toLocaleDateString("en-AU", { weekday: "short", timeZone: "UTC" }).toUpperCase();
+        const shortMonth = date.toLocaleDateString("en-AU", { month: "short", timeZone: "UTC" }).toUpperCase();
         const fullDate = date.toLocaleDateString("en-AU", {
           weekday: "long",
           day: "numeric",
@@ -392,119 +458,54 @@ function renderEvents() {
         const venue = escapeEventText(event.venue);
         const suburb = escapeEventText(event.suburb);
         const category = escapeEventText(event.category);
-
-        const price = isFree
-          ? "FREE ENTRY"
-          : escapeEventText(event.priceDisplay);
-
-        const categoryClass = [
-          "sticker-music",
-          "sticker-comedy",
-          "sticker-dj",
-          "sticker-openmic"
-        ].includes(event.stickerClass)
+        const price = isFree ? "FREE ENTRY" : escapeEventText(event.priceDisplay);
+        const categoryClass = ["sticker-music", "sticker-comedy", "sticker-dj", "sticker-openmic"].includes(event.stickerClass)
           ? event.stickerClass
           : "sticker-openmic";
+        const timeLabel = event.doorsTime ? `Doors ${escapeEventText(event.doorsTime)}` : `Start ${escapeEventText(event.timeString)}`;
 
-        const timeLabel = event.doorsTime
-          ? `Doors ${escapeEventText(event.doorsTime)}`
-          : `Start ${escapeEventText(event.timeString)}`;
+        // Venue initials typographic block
+        const thumbnail = `
+          <div class="event-row-initials ${categoryClass}" aria-hidden="true" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-weight:700;font-size:1.1rem;background:#F3F4F6;color:#5E6470;border-radius:4px;border:1px solid #E5E7EB;">
+            ${escapeEventText(event.initials)}
+          </div>
+        `;
 
-        const thumbnail = event.imageUrl
-          ? `
-            <img
-              src="${escapeEventText(event.imageUrl)}"
-              alt="${escapeEventText(event.imageAlt || "")}"
-              width="120"
-              height="80"
-              loading="lazy"
-            >
-          `
-          : `
-            <span aria-hidden="true">
-              ${escapeEventText(event.initials)}
-            </span>
-          `;
-
-                // Free events can link to event information; paid events link to tickets.
-        const destination = isFree
-          ? event.eventUrl || event.ticketUrl
-          : event.ticketUrl;
-
-        const validUrl = /^https:\/\//i.test(destination || "")
-          ? destination
-          : null;
-
+        const destination = isFree ? (event.eventUrl || event.ticketUrl) : event.ticketUrl;
+        const validUrl = /^https?:\/\//i.test(destination || "") ? destination : null;
         const buttonLabel = isFree ? "Free" : "Tickets";
 
         const action = validUrl
-          ? `
-            <a
-              class="event-row-action"
-              href="${escapeEventText(validUrl)}"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="${isFree ? "Information" : "Tickets"} for ${title} (opens in a new tab)"
-            >
-              ${buttonLabel} <span aria-hidden="true">→</span>
-            </a>
-          `
-          : `
-            <span
-              class="event-row-action is-unavailable"
-              aria-disabled="true"
-              title="Event link not added yet"
-            >
-              ${buttonLabel}
-            </span>
-          `;
+          ? `<a class="event-row-action" href="${escapeEventText(validUrl)}" target="_blank" rel="noopener noreferrer" aria-label="${isFree ? "Information" : "Tickets"} for ${title} (opens in a new tab)">
+              ${buttonLabel} <span aria-hidden="true">&rarr;</span>
+            </a>`
+          : `<span class="event-row-action is-unavailable" aria-disabled="true" title="Event link not added yet">${buttonLabel}</span>`;
 
         return `
           <article class="event-row">
-            <time
-              class="event-row-date"
-              datetime="${event.isoDate}"
-              aria-label="${escapeEventText(fullDate)}"
-            >
+            <time class="event-row-date" datetime="${event.isoDate}" aria-label="${escapeEventText(fullDate)}">
               <span>${weekday}</span>
               <strong>${String(eventDay).padStart(2, "0")}</strong>
               <span>${shortMonth}</span>
             </time>
-
-            <div class="event-row-thumbnail">
-              ${thumbnail}
-            </div>
-
+            <div class="event-row-thumbnail">${thumbnail}</div>
             <div class="event-row-info">
               <div class="event-row-tags">
-                <span class="sticker-tag ${categoryClass}">
-                  ${category}
-                </span>
-                <span aria-hidden="true">·</span>
-                <span class="sticker-tag sticker-price ${isFree ? "is-free" : ""}">
-                  ${price}
-                </span>
+                <span class="sticker-tag ${categoryClass}">${category}</span>
+                <span aria-hidden="true">&middot;</span>
+                <span class="sticker-tag sticker-price ${isFree ? "is-free" : ""}">${price}</span>
               </div>
-
               <h3 class="event-row-title">${title}</h3>
-
-              <p class="event-row-meta">
-                ${venue} · ${suburb} · ${timeLabel}
-              </p>
+              <p class="event-row-meta">${venue} &middot; ${suburb} &middot; ${timeLabel}</p>
             </div>
-
-            <div class="event-row-action-slot">
-              ${action}
-            </div>
+            <div class="event-row-action-slot">${action}</div>
           </article>
         `;
       }).join("");
 
       return `
         <section class="event-month">
-          <h3 class="event-month-heading">
-            ${escapeEventText(monthHeading)}
-          </h3>
+          <h3 class="event-month-heading">${escapeEventText(monthHeading)}</h3>
           <div class="event-month-list">${rows}</div>
         </section>
       `;
@@ -512,360 +513,258 @@ function renderEvents() {
 }
 
 // 7. Event Handlers
-// Search input
-searchInput.addEventListener('input', (e) => {
-  searchQuery = e.target.value;
-  renderEvents();
-});
+if (searchInput) {
+  searchInput.addEventListener('input', (e) => {
+    searchQuery = e.target.value;
+    renderEvents();
+  });
+}
 
-// Fast-tap filter chips
 filterChips.forEach(chip => {
   chip.addEventListener('click', () => {
     filterChips.forEach(c => {
       c.classList.remove('is-active');
       c.setAttribute('aria-pressed', 'false');
     });
-
-        chip.classList.add('is-active');
+    chip.classList.add('is-active');
     chip.setAttribute('aria-pressed', 'true');
     currentFilter = chip.dataset.filter;
     renderEvents();
   });
 });
 
-// Reset filters function
 window.resetAllFilters = function() {
-  currentFilter = 'all';
+  currentFilter = 'this-week';
   searchQuery = '';
-  searchInput.value = '';
+  selectedDatePreset = "this-week";
+  selectedSingleDate = null;
+  selectedRangeStart = null;
+  selectedRangeEnd = null;
+
+  if (searchInput) searchInput.value = '';
 
   filterChips.forEach(c => {
-    const isAll = c.dataset.filter === 'all';
-    c.classList.toggle('is-active', isAll);
-    c.setAttribute('aria-pressed', isAll ? 'true' : 'false');
+    const isDefault = c.dataset.filter === 'this-week' || c.dataset.filter === 'all';
+    c.classList.toggle('is-active', isDefault);
+    c.setAttribute('aria-pressed', isDefault ? 'true' : 'false');
   });
 
+  const dateLabel = document.getElementById("date-trigger-label");
+  if (dateLabel) dateLabel.textContent = "This week";
+
+  renderCalendar();
+  updateDateFooter();
   renderEvents();
 };
 
-resetBtn.addEventListener('click', resetAllFilters);
+if (resetBtn) resetBtn.addEventListener('click', resetAllFilters);
 
-// Honest newsletter feedback (per acceptance criteria)
-newsletterForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const emailInput = document.getElementById('newsletter-email');
+if (newsletterForm) {
+  newsletterForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const emailInput = document.getElementById('newsletter-email');
+    if (emailInput && emailInput.value) {
+      if (newsletterFeedback) {
+        newsletterFeedback.textContent = `Thanks! You'll receive the Thursday dispatch once publication begins.`;
+        newsletterFeedback.style.color = 'var(--cobalt, #002B49)';
+      }
+      emailInput.value = '';
+    }
+  });
+}
 
-  if (emailInput.value) {
-    newsletterFeedback.textContent = `Thanks! You'll receive the Thursday dispatch once publication begins.`;
-    newsletterFeedback.style.color = 'var(--cobalt)';
-    emailInput.value = '';
-  }
-});
-
-// 8. Initial Boot
-renderEvents();
-// Restored Date button: open and close the calendar panel
+// 8. RESTORED DATE CALENDAR & MODAL CONTROLS
 const dateTriggerButton = document.getElementById("date-trigger-btn");
 const datePickerPanel = document.getElementById("date-picker-modal");
 const closeDatePickerButton = document.getElementById("date-modal-close");
+const calendarPreviousButton = document.getElementById("cal-prev-month");
+const calendarNextButton = document.getElementById("cal-next-month");
+const calendarMonthDisplay = document.getElementById("cal-month-label");
+const calendarGrid = document.getElementById("calendar-days-grid");
+const rangeToggle = document.getElementById("range-toggle-checkbox");
+const dateLabel = document.getElementById("date-trigger-label");
+const dateFooterLabel = document.getElementById("footer-selection-label");
+const dateClearButton = document.getElementById("date-clear-btn");
+const dateApplyButton = document.getElementById("date-apply-btn");
+
+let displayedCalendarMonth = new Date();
 
 function closeDatePicker() {
-  datePickerPanel.hidden = true;
-  dateTriggerButton.setAttribute("aria-expanded", "false");
+  if (datePickerPanel) {
+    datePickerPanel.hidden = true;
+    if (dateTriggerButton) dateTriggerButton.setAttribute("aria-expanded", "false");
+  }
 }
 
-dateTriggerButton.addEventListener("click", () => {
-  const shouldOpen = datePickerPanel.hidden;
+if (dateTriggerButton && datePickerPanel) {
+  dateTriggerButton.addEventListener("click", () => {
+    const shouldOpen = datePickerPanel.hidden;
+    datePickerPanel.hidden = !shouldOpen;
+    dateTriggerButton.setAttribute("aria-expanded", String(shouldOpen));
+    if (shouldOpen && closeDatePickerButton) closeDatePickerButton.focus();
+  });
+}
 
-  datePickerPanel.hidden = !shouldOpen;
-  dateTriggerButton.setAttribute("aria-expanded", String(shouldOpen));
-
-  if (shouldOpen) {
-    closeDatePickerButton.focus();
-  }
-});
-
-closeDatePickerButton.addEventListener("click", () => {
-  closeDatePicker();
-  dateTriggerButton.focus();
-});
+if (closeDatePickerButton) {
+  closeDatePickerButton.addEventListener("click", () => {
+    closeDatePicker();
+    if (dateTriggerButton) dateTriggerButton.focus();
+  });
+}
 
 document.addEventListener("click", (event) => {
-  if (event.target.closest("#date-picker-modal")) return;
-  if (event.target.closest("#date-trigger-btn")) return;
+  if (event.target.closest("#date-picker-modal") || event.target.closest("#date-trigger-btn")) return;
   closeDatePicker();
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !datePickerPanel.hidden) {
+  if (event.key === "Escape" && datePickerPanel && !datePickerPanel.hidden) {
     closeDatePicker();
-    dateTriggerButton.focus();
+    if (dateTriggerButton) dateTriggerButton.focus();
   }
 });
 
+function updateDatePresetCounts() {
+  const weekEnd = getThisWeekEndISO();
+  const tomorrow = addDaysToISO(todayISO, 1);
+  const sevenDaysEnd = addDaysToISO(todayISO, 6);
+  const thirtyDaysEnd = addDaysToISO(todayISO, 29);
 
-// ========================================================
-// RESTORED DATE CALENDAR — UP TO SIX MONTHS AHEAD
-// ========================================================
+  document.querySelectorAll(".preset-btn").forEach(button => {
+    const preset = button.dataset.preset;
 
+    const count = brisbaneEvents.filter(event => {
+      if (event.isoDate < todayISO) return false;
 
-const calendarDaysGrid = document.getElementById("calendar-days-grid");
-const calendarMonthLabel = document.getElementById("cal-month-label");
-const calendarPreviousButton = document.getElementById("cal-prev-month");
-const calendarNextButton = document.getElementById("cal-next-month");
-const dateLabel = document.getElementById("date-trigger-label");
-const rangeToggle = document.getElementById("range-toggle-checkbox");
-const dateClearButton = document.getElementById("date-clear-btn");
-const dateApplyButton = document.getElementById("date-apply-btn");
-const dateFooterLabel = document.getElementById("footer-selection-label");
-const dateFooterCount = document.getElementById("footer-selection-sub");
+      switch (preset) {
+        case "anytime":
+          return true;
+        case "tonight":
+          return event.isoDate === todayISO;
+        case "tomorrow":
+          return event.isoDate === tomorrow;
+        case "this-weekend":
+          return isThisWeekend(event.isoDate);
+        case "this-week":
+          return event.isoDate <= weekEnd;
+        case "next-7-days":
+          return event.isoDate <= sevenDaysEnd;
+        case "next-30-days":
+          return event.isoDate <= thirtyDaysEnd;
+        default:
+          return false;
+      }
+    }).length;
 
-const [todayYear, todayMonth, todayDay] = todayISO.split("-").map(Number);
-
-let displayedCalendarMonth = new Date(
-  todayYear,
-  todayMonth - 1,
-  1
-);
-
-const firstCalendarMonth = new Date(
-  todayYear,
-  todayMonth - 1,
-  1
-);
-
-const finalCalendarMonth = new Date(
-  todayYear,
-  todayMonth + 5,
-  1
-);
-
-function dateToISO(year, monthIndex, day) {
-  return [
-    year,
-    String(monthIndex + 1).padStart(2, "0"),
-    String(day).padStart(2, "0")
-  ].join("-");
-}
-
-function formatDateForPicker(isoDate) {
-  const [year, month, day] = isoDate.split("-").map(Number);
-
-  return new Date(year, month - 1, day).toLocaleDateString("en-AU", {
-    weekday: "short",
-    day: "numeric",
-    month: "short"
+    const countSpan = button.querySelector(".preset-count");
+    if (countSpan) countSpan.textContent = String(count);
   });
-}
-
-function eventMatchesSelectedDate(event) {
-  if (selectedDatePreset === "anytime") {
-    return true;
-  }
-
-  if (selectedDatePreset === "tonight") {
-    return event.isoDate === todayISO;
-  }
-
-  if (selectedDatePreset === "tomorrow") {
-    return event.isoDate === addDaysToISO(todayISO, 1);
-  }
-
-  if (selectedDatePreset === "this-weekend") {
-    return isThisWeekend(event.isoDate);
-  }
-
-  if (selectedDatePreset === "this-week") {
-    const todayDayOfWeek = new Date(
-      Date.UTC(todayYear, todayMonth - 1, todayDay)
-    ).getUTCDay();
-
-    const daysUntilSunday = (7 - todayDayOfWeek) % 7;
-    const weekEnd = addDaysToISO(todayISO, daysUntilSunday);
-
-    return event.isoDate >= todayISO && event.isoDate <= weekEnd;
-  }
-
-  if (selectedDatePreset === "next-7-days") {
-    return (
-      event.isoDate >= todayISO &&
-      event.isoDate <= addDaysToISO(todayISO, 7)
-    );
-  }
-
-  if (selectedDatePreset === "next-30-days") {
-    return (
-      event.isoDate >= todayISO &&
-      event.isoDate <= addDaysToISO(todayISO, 30)
-    );
-  }
-
-  if (selectedDatePreset === "single-date") {
-    return event.isoDate === selectedSingleDate;
-  }
-
-  if (selectedDatePreset === "date-range") {
-    return (
-      event.isoDate >= selectedRangeStart &&
-      event.isoDate <= selectedRangeEnd
-    );
-  }
-
-  return true;
-}
-
-function countMatchingDateEvents() {
-  return brisbaneEvents.filter(eventMatchesSelectedDate).length;
 }
 
 function updateDateFooter() {
-  dateFooterCount.textContent = `${countMatchingDateEvents()} matching gigs`;
-}
-
-function updateDatePresetCounts() {
-  const presetCountElements = {
-    anytime: document.getElementById("count-anytime"),
-    tonight: document.getElementById("count-tonight"),
-    tomorrow: document.getElementById("count-tomorrow"),
-    "this-weekend": document.getElementById("count-weekend"),
-    "this-week": document.getElementById("count-week"),
-    "next-7-days": document.getElementById("count-7days"),
-    "next-30-days": document.getElementById("count-30days")
-  };
-
-  Object.entries(presetCountElements).forEach(([preset, element]) => {
-    const count = brisbaneEvents.filter((event) => {
-      const savedPreset = selectedDatePreset;
-      selectedDatePreset = preset;
-      const matches = eventMatchesSelectedDate(event);
-      selectedDatePreset = savedPreset;
-      return matches;
-    }).length;
-
-    element.textContent = count;
-  });
+  if (!dateFooterLabel) return;
+  if (selectedRangeStart && selectedRangeEnd) {
+    dateFooterLabel.textContent = `${formatEventDate(selectedRangeStart)} – ${formatEventDate(selectedRangeEnd)}`;
+  } else if (selectedSingleDate) {
+    dateFooterLabel.textContent = formatEventDate(selectedSingleDate);
+  } else {
+    dateFooterLabel.textContent = "This week";
+  }
 }
 
 function renderCalendar() {
+  if (!calendarGrid || !calendarMonthDisplay) return;
+
   const year = displayedCalendarMonth.getFullYear();
   const month = displayedCalendarMonth.getMonth();
 
-  calendarMonthLabel.textContent = displayedCalendarMonth.toLocaleDateString(
-    "en-AU",
-    {
-      month: "long",
-      year: "numeric"
-    }
-  );
+  calendarMonthDisplay.textContent = new Date(year, month).toLocaleDateString("en-AU", {
+    month: "long",
+    year: "numeric"
+  });
 
-  calendarPreviousButton.disabled =
-    displayedCalendarMonth.getTime() === firstCalendarMonth.getTime();
-
-  calendarNextButton.disabled =
-    displayedCalendarMonth.getTime() === finalCalendarMonth.getTime();
-
-  calendarDaysGrid.innerHTML = "";
-
-  const firstDayOfMonth = new Date(year, month, 1);
-  const weekdayStartingMonday = (firstDayOfMonth.getDay() + 6) % 7;
+  const firstDay = new Date(year, month, 1).getDay(); // 0 is Sun
   const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const leadingBlanks = (firstDay + 6) % 7; // Monday start
 
-  for (let blankDay = 0; blankDay < weekdayStartingMonday; blankDay += 1) {
-    const blankCell = document.createElement("div");
-    blankCell.className = "cal-day cal-day-empty";
-    calendarDaysGrid.appendChild(blankCell);
+  calendarGrid.innerHTML = "";
+
+  for (let i = 0; i < leadingBlanks; i++) {
+    const blank = document.createElement("div");
+   blank.className = "cal-day cal-day-empty";
+    calendarGrid.appendChild(blank);
   }
 
-  for (let day = 1; day <= daysInMonth; day += 1) {
-    const dayButton = document.createElement("button");
-    const isoDate = dateToISO(year, month, day);
-    const thisDay = new Date(year, month, day);
-    const todayAtMidnight = new Date(todayYear, todayMonth - 1, todayDay);
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isoDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "cal-day";
+    btn.textContent = d;
+    btn.dataset.date = isoDate;
 
-    dayButton.type = "button";
-    dayButton.className = "cal-day";
-    dayButton.textContent = day;
-    dayButton.setAttribute("aria-label", formatDateForPicker(isoDate));
-
-    if (thisDay < todayAtMidnight) {
-      dayButton.disabled = true;
+    if (isoDate < todayISO) {
+      btn.disabled = true;
+      btn.classList.add("is-disabled");
     }
 
-    if (brisbaneEvents.some((event) => event.isoDate === isoDate)) {
-      dayButton.classList.add("has-gigs");
-    }
-
+        // Highlight a single date or both range endpoints
     if (
-      selectedDatePreset === "single-date" &&
-      selectedSingleDate === isoDate
+      selectedSingleDate === isoDate ||
+      selectedRangeStart === isoDate ||
+      selectedRangeEnd === isoDate
     ) {
-      dayButton.classList.add("selected");
+      btn.classList.add("selected");
     }
 
-    if (selectedDatePreset === "date-range") {
-      if (isoDate === selectedRangeStart || isoDate === selectedRangeEnd) {
-        dayButton.classList.add("selected");
-      }
-
-      if (
-        selectedRangeStart &&
-        selectedRangeEnd &&
-        isoDate > selectedRangeStart &&
-        isoDate < selectedRangeEnd
-      ) {
-        dayButton.classList.add("in-range");
-      }
+    // Highlight the dates between the range endpoints
+    if (
+      selectedRangeStart &&
+      selectedRangeEnd &&
+      isoDate > selectedRangeStart &&
+      isoDate < selectedRangeEnd
+    ) {
+      btn.classList.add("in-range");
     }
 
-    dayButton.addEventListener("click", (event) => {
+    btn.addEventListener("click", (event) => {
   event.stopPropagation();
-  chooseCalendarDate(isoDate);
+  handleDateClick(isoDate);
 });
-
-    calendarDaysGrid.appendChild(dayButton);
+    calendarGrid.appendChild(btn);
   }
 }
 
-function chooseCalendarDate(isoDate) {
-  document.querySelectorAll(".preset-btn").forEach((button) => {
-    button.classList.remove("active");
-    button.setAttribute("aria-pressed", "false");
-  });
+function handleDateClick(isoDate) {
+  selectedDatePreset = null;
+  document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
 
-  if (!rangeToggle.checked) {
-    selectedDatePreset = "single-date";
+  const isRangeMode = rangeToggle ? rangeToggle.checked : false;
+
+  if (!isRangeMode) {
     selectedSingleDate = isoDate;
     selectedRangeStart = null;
     selectedRangeEnd = null;
-
-    const formattedDate = formatDateForPicker(isoDate);
-    dateLabel.textContent = formattedDate;
-    dateFooterLabel.textContent = formattedDate;
-  } else if (!selectedRangeStart || selectedRangeEnd) {
-    selectedDatePreset = "date-range";
-    selectedSingleDate = null;
-    selectedRangeStart = isoDate;
-    selectedRangeEnd = null;
-
-    const startLabel = `From ${formatDateForPicker(isoDate)}`;
-    dateLabel.textContent = startLabel;
-    dateFooterLabel.textContent = startLabel;
+    if (dateLabel) dateLabel.textContent = formatEventDate(isoDate);
+    if (dateFooterLabel) dateFooterLabel.textContent = formatEventDate(isoDate);
   } else {
-    selectedDatePreset = "date-range";
-    selectedRangeEnd = isoDate;
-
-    if (selectedRangeEnd < selectedRangeStart) {
-      const originalStart = selectedRangeStart;
-      selectedRangeStart = selectedRangeEnd;
-      selectedRangeEnd = originalStart;
+    selectedSingleDate = null;
+    if (!selectedRangeStart || (selectedRangeStart && selectedRangeEnd)) {
+      selectedRangeStart = isoDate;
+      selectedRangeEnd = null;
+    } else {
+      if (isoDate < selectedRangeStart) {
+        selectedRangeEnd = selectedRangeStart;
+        selectedRangeStart = isoDate;
+      } else {
+        selectedRangeEnd = isoDate;
+      }
     }
-
-    const rangeLabel = `${formatDateForPicker(
-      selectedRangeStart
-    )} – ${formatDateForPicker(selectedRangeEnd)}`;
-
-    dateLabel.textContent = rangeLabel;
-    dateFooterLabel.textContent = rangeLabel;
+    const rangeLabel = selectedRangeEnd
+      ? `${formatEventDate(selectedRangeStart)} – ${formatEventDate(selectedRangeEnd)}`
+      : formatEventDate(selectedRangeStart);
+    if (dateLabel) dateLabel.textContent = rangeLabel;
+    if (dateFooterLabel) dateFooterLabel.textContent = rangeLabel;
   }
 
   renderCalendar();
@@ -879,8 +778,8 @@ function selectDatePreset(preset, label) {
   selectedRangeStart = null;
   selectedRangeEnd = null;
 
-  dateLabel.textContent = label;
-  dateFooterLabel.textContent = label;
+  if (dateLabel) dateLabel.textContent = label;
+  if (dateFooterLabel) dateFooterLabel.textContent = label;
 
   document.querySelectorAll(".preset-btn").forEach((button) => {
     const isSelected = button.dataset.preset === preset;
@@ -888,44 +787,127 @@ function selectDatePreset(preset, label) {
     button.setAttribute("aria-pressed", String(isSelected));
   });
 
-   renderCalendar();
+  renderCalendar();
   updateDateFooter();
   renderEvents();
 }
 
 document.querySelectorAll(".preset-btn").forEach((button) => {
   button.addEventListener("click", () => {
-    selectDatePreset(
-      button.dataset.preset,
-      button.querySelector("span").textContent
-    );
+    const span = button.querySelector("span");
+    selectDatePreset(button.dataset.preset, span ? span.textContent : button.textContent);
   });
 });
 
-calendarPreviousButton.addEventListener("click", () => {
-  displayedCalendarMonth.setMonth(displayedCalendarMonth.getMonth() - 1);
-  renderCalendar();
-});
+if (calendarPreviousButton) {
+  calendarPreviousButton.addEventListener("click", () => {
+    displayedCalendarMonth.setMonth(displayedCalendarMonth.getMonth() - 1);
+    renderCalendar();
+  });
+}
 
-calendarNextButton.addEventListener("click", () => {
-  displayedCalendarMonth.setMonth(displayedCalendarMonth.getMonth() + 1);
-  renderCalendar();
-});
+if (calendarNextButton) {
+  calendarNextButton.addEventListener("click", () => {
+    displayedCalendarMonth.setMonth(displayedCalendarMonth.getMonth() + 1);
+    renderCalendar();
+  });
+}
 
-dateClearButton.addEventListener("click", () => {
-  rangeToggle.checked = false;
-  selectDatePreset("anytime", "Anytime");
-});
+if (dateClearButton) {
+  dateClearButton.addEventListener("click", () => {
+    if (rangeToggle) rangeToggle.checked = false;
+    selectDatePreset("anytime", "Anytime");
+  });
+}
+
 if (dateApplyButton) {
   dateApplyButton.addEventListener("click", () => {
     renderEvents();
     closeDatePicker();
-    dateTriggerButton.focus();
+    if (dateTriggerButton) dateTriggerButton.focus();
   });
 }
 
-// First calendar render
-updateDatePresetCounts();
-renderCalendar();
-updateDateFooter();
-renderFeatured();
+// 9. Load Live Events From Google Sheets
+async function loadLiveEvents() {
+  if (eventsGrid) {
+    eventsGrid.innerHTML = '<p class="empty-state">Loading Brisbane gigs&hellip;</p>';
+  }
+
+  try {
+    const res = await fetch(`${SHEET_CSV_URL}&_=${Date.now()}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const rows = parseCSV(text);
+
+    brisbaneEvents = rows
+      .filter(r => String(r.Status || '').trim().toLowerCase() === 'approved')
+      .map(r => {
+        const isoDate = normaliseDateToISO(r.Event_Date);
+        return {
+          id: r.Event_ID || `ev-${Math.random().toString(36).slice(2)}`,
+          title: String(r.Event_Name || '').trim(),
+          venue: String(r.Venue_Name || 'Venue TBA').trim(),
+          suburb: String(r.Suburb || 'Brisbane').trim(),
+          isoDate: isoDate,
+          timeString: String(r.Door_Time || 'Doors 7:30 PM').trim(),
+          doorsTime: String(r.Door_Time || '').trim(),
+          category: String(r.Category || 'Live music').trim(),
+          stickerClass: getStickerClass(r.Category),
+          initials: venueInitials(r.Venue_Name),
+          price: getPriceValue(r.Exact_Price, r.Price_Tier),
+          priceDisplay: getPriceDisplay(r.Exact_Price, r.Price_Tier),
+          description: String(r.Editorial_Blurb || '').trim(),
+          ticketUrl: getValidEventLink(r.Ticket_URL, r.Official_Source_URL),
+          isFeatured: String(r.Featured_Paid || '').trim().toLowerCase() === 'yes'
+        };
+      })
+      .filter(e => e.title && e.isoDate)
+      .sort((a, b) => a.isoDate.localeCompare(b.isoDate));
+
+    // Featured Paid cards: pick items with Featured_Paid = Yes
+    featuredEvents = brisbaneEvents.filter(e => e.isFeatured).slice(0, 3);
+    // Fallback: if none are marked Yes, pick first 3 future gigs
+    if (featuredEvents.length === 0) {
+      featuredEvents = brisbaneEvents.filter(e => e.isoDate >= todayISO).slice(0, 3);
+    }
+
+    populateSuburbDropdown();
+    renderFeatured();
+    updateDatePresetCounts();
+    renderCalendar();
+    updateDateFooter();
+    renderEvents();
+  } catch (err) {
+    console.error('Error fetching Google Sheet:', err);
+    if (eventsGrid) {
+      eventsGrid.innerHTML = `
+        <div class="empty-state">
+          <p>Unable to load live gigs right now. Please refresh in a moment.</p>
+        </div>
+      `;
+    }
+  }
+}
+
+// Initial Boot
+// Main page Apply and Clear buttons
+const mainApplyBtn = document.getElementById('filter-apply-btn');
+const mainClearBtn = document.getElementById('filter-clear-btn');
+
+if (mainApplyBtn) {
+  mainApplyBtn.addEventListener('click', () => {
+    renderEvents();
+  });
+}
+
+if (mainClearBtn) {
+  mainClearBtn.addEventListener('click', () => {
+    document.getElementById('filter-suburb').value = 'all';
+    document.getElementById('filter-type').value = 'all';
+    document.getElementById('filter-price').value = 'all';
+
+    resetAllFilters();
+  });
+}
+loadLiveEvents();
