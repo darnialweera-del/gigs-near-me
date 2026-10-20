@@ -872,6 +872,8 @@ async function loadLiveEvents() {
       featuredEvents = brisbaneEvents.filter(e => e.isoDate >= todayISO).slice(0, 3);
     }
 
+        const tileCount = document.getElementById('hero-tile-count');
+    if (tileCount) tileCount.textContent = `${brisbaneEvents.length} GIGS`;
     populateSuburbDropdown();
     renderFeatured();
     updateDatePresetCounts();
