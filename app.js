@@ -1,7 +1,8 @@
 // GIGS NEAR ME — BRISBANE EVENT ENGINE (VERSION 2.0)
 // Live Data via Google Sheets "Published" tab
 
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1Zv0uvaoHneYxbnD3XKkh6aFc8U_wh9gYL9YI2V-lUw8/gviz/tq?tqx=out:csv&sheet=Published';
+const SHEET_CSV_URL =
+  'https://docs.google.com/spreadsheets/d/1CEN8jSGQgsyYmj3kUOiNevcffVwNuVXkBo4Op8hpPxQ/gviz/tq?tqx=out:csv&sheet=Published';
 
 // 1. Timezone-aware date calculations (Australia/Brisbane)
 function getBrisbaneDateParts() {
@@ -202,7 +203,8 @@ function renderFeatured() {
         </div>
         <div class="card-content">
           <div class="card-date-row">
-            ${formatEventDate(event.isoDate)} &middot; ${escapeEventText(event.doorsTime ? 'Doors ' + event.doorsTime : event.timeString)}
+            ${formatEventDate(event.isoDate)} &middot; ${escapeEventText('Time ' + String(event.doorsTime || event.timeString || 'TBA').replace(/^(?:(?:doors?|starts?|time)\s*:?\s*)+/i, '').trim()
+)}
           </div>
           <h3 class="card-title">${escapeEventText(event.title)}</h3>
           <div class="card-venue">${escapeEventText(event.venue)} &middot; ${escapeEventText(event.suburb)}</div>
@@ -462,7 +464,13 @@ function renderEvents() {
         const categoryClass = ["sticker-music", "sticker-comedy", "sticker-dj", "sticker-openmic"].includes(event.stickerClass)
           ? event.stickerClass
           : "sticker-openmic";
-        const timeLabel = event.doorsTime ? `Doors ${escapeEventText(event.doorsTime)}` : `Start ${escapeEventText(event.timeString)}`;
+        const cleanTime = String(event.doorsTime || event.timeString || '')
+  .replace(/^(?:(?:doors?|starts?|time)\s*:?\s*)+/i, '')
+  .trim();
+
+const timeLabel = cleanTime
+  ? `Time ${escapeEventText(cleanTime)}`
+  : 'Time TBA';
 
         // Venue initials typographic block
         const thumbnail = `
